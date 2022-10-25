@@ -82,3 +82,14 @@ jobs:
           echo "matrix=${{ toJson(steps.set-matrix-new.outputs.test-matrix-new) }}"
           echo "dir=${{ matrix.test-directory }}"
         # yamllint enable rule:line-length
+
+  from-github-page:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set color
+        id: random-color-generator
+        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+      - name: Get color
+        # yamllint disable rule:line-length
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+        # yamllint enable rule:line-length
