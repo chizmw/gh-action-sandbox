@@ -40,3 +40,45 @@ jobs:
           echo "matrix=${{ toJson(needs.discover-test-cases.outputs.test-matrix) }}"
           echo "dir=${{ matrix.test-directory }}"
         # yamllint enable rule:line-length
+
+  discover-test-cases-new:
+    name: Discover test case directories
+    runs-on: ubuntu-latest
+    outputs:
+      test-matrix-new: ${{ steps.set-matrix.outputs.test-matrix-new }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set matrix
+        id: set-matrix-new
+        # yamllint disable rule:line-length
+        run: |
+          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')"
+          echo "matches=${matches}"
+          echo "{test-matrix-new}={${matches}}" >> $GITHUB_OUTPUT
+        # yamllint enable rule:line-length
+  debug-the-value-new:
+    runs-on: ubuntu-latest
+    needs: discover-test-cases-new
+    steps:
+      - name: Debug
+        # yamllint disable rule:line-length
+        run: |
+          echo "needs1=${{ toJson(needs.discover-test-cases-new.outputs.test-matrix-new) }}"
+          echo "steps1=${{ toJson(steps.discover-test-cases-new.outputs.test-matrix-new) }}"
+          echo "needs2=${{ toJson(needs.set-matrix-new.outputs.test-matrix-new) }}"
+          echo "steps2=${{ toJson(steps.set-matrix-new.outputs.test-matrix-new) }}"
+        # yamllint enable rule:line-length
+  debug-test-cases-new:
+    runs-on: ubuntu-latest
+    needs: discover-test-cases-new
+    strategy:
+      matrix:
+        # yamllint disable-line rule:line-length
+        test-directory: [foo, bar]
+    steps:
+      - name: Debug
+        # yamllint disable rule:line-length
+        run: |
+          echo "matrix=${{ toJson(steps.set-matrix-new.outputs.test-matrix-new) }}"
+          echo "dir=${{ matrix.test-directory }}"
+        # yamllint enable rule:line-length
