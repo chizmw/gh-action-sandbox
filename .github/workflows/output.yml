@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Get color
         # yamllint disable rule:line-length
-        run: echo "The selected color is ${{ needs.spin_up.outputs.SELECTED_COLOR }}"
+        run: echo "The selected color is ${{ needs.spin_up.outputs.SELECTED_COLOR }}" >> $GITHUB_STEP_SUMMARY
         # yamllint enable rule:line-length
 
   share_discoveries:
@@ -107,4 +107,5 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.job1.outputs.matrix)}}
     steps:
-      - run: echo ${{ matrix.project }} ${{ matrix.config }}
+      - run: |
+          echo ${{ matrix.project }} ${{ matrix.config }} >>$GITHUB_STEP_SUMMARY
