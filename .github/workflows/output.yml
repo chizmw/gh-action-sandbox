@@ -30,7 +30,6 @@ jobs:
           # use sed to remove the (trailing) '/'
           # use jq-fu to convert the list into a json array, and then into a json string
           matches=$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1] |@json')
-          echo "matches=${matches}"
           # push into our step output
           echo "DISCOVERED_TESTS='${matches}'" >> $GITHUB_OUTPUT
         # yamllint enable rule:line-length
@@ -44,6 +43,10 @@ jobs:
           echo "This is a summary of the step" >> $GITHUB_STEP_SUMMARY
           echo '```txt' >> $GITHUB_STEP_SUMMARY
           echo ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```txt' >> $GITHUB_STEP_SUMMARY
+          echo ${{ toJson(steps.discover-test-cases.outputs.DISCOVERED_TESTS) }} >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
     outputs:
@@ -86,7 +89,7 @@ jobs:
       - name: Debug
         # yamllint disable rule:line-length
         run: |
-          echo "matrix=${{ toJson(needs.spin_up.outputs.DISCOVERED) }}"
+          echo "you are in ${{ matrix.test-directory }}"
         # yamllint enable rule:line-length
 
   job1:
