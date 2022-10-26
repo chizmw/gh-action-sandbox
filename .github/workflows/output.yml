@@ -26,8 +26,12 @@ jobs:
         id: discover-test-cases
         # yamllint disable rule:line-length
         run: |
-          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')"
+          # get a list of all the test-*/ directories in the test directory
+          # use sed to remove the (trailing) '/'
+          # use jq-fu to convert the list into a json array, and then into a json string
+          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1] |@json')"
           echo "matches=${matches}"
+          # push into our step output
           echo "DISCOVERED_TESTS='${matches}'" >> $GITHUB_OUTPUT
         # yamllint enable rule:line-length
       - name: Get Tests
@@ -35,11 +39,16 @@ jobs:
         run: echo "The discovered tests are ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }}"
         # yamllint enable rule:line-lengthprework
       - name: Summary
-        run: echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
+        run: |
+          echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "This is a summary of the step" >> $GITHUB_STEP_SUMMARY
+          echo '```txt' >> $GITHUB_STEP_SUMMARY
+          echo ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
     outputs:
       DISCOVERED: ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }}
-      SELECTED_COLORX: ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}
+      SELECTED_COLOR: ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}
 
   something_colorful:
     runs-on: ubuntu-latest
@@ -50,13 +59,28 @@ jobs:
         run: echo "The selected color is ${{ needs.spin_up.outputs.SELECTED_COLOR }}"
         # yamllint enable rule:line-length
 
+  share_discoveries:
+    runs-on: ubuntu-latest
+    needs: spin_up
+    steps:
+      - name: Get Tests
+        # yamllint disable rule:line-length
+        run: echo "The discovered tests are ${{ needs.spin_up.outputs.DISCOVERED }}"
+        # yamllint enable rule:line-length
+      - name: Summary
+        run: |
+          echo "This is a summary of the step" >> $GITHUB_STEP_SUMMARY
+          echo '```txt' >> $GITHUB_STEP_SUMMARY
+          echo ${{ needs.spin_up.outputs.DISCOVERED }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
   something_testy:
     runs-on: ubuntu-latest
     needs: spin_up
     strategy:
       matrix:
         # yamllint disable-line rule:line-length
-        test-directory: ${{ needs.spin_up.outputs.DISCOVERED }}
+        test-directory: ${{ fromJson(needs.spin_up.outputs.DISCOVERED) }}
     steps:
       - name: Debug
         # yamllint disable rule:line-length
