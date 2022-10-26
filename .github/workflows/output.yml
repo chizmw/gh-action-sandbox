@@ -83,8 +83,9 @@ jobs:
     strategy:
       matrix:
         # yamllint disable-line rule:line-length
-        test-directory: ${{ toJson(needs.spin_up.outputs.DISCOVERED) }}
-        ## test-directory: [test-1, test-2, test-3]
+        something: [one, two, three]
+        include:
+          - test-directory: ${{ toJson(needs.spin_up.outputs.DISCOVERED) }}
     steps:
       - name: Debug
         # yamllint disable rule:line-length
