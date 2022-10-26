@@ -86,11 +86,13 @@ jobs:
         something: [one, two, three]
         include:
           - test-directory: ${{ toJson(needs.spin_up.outputs.DISCOVERED) }}
+            somethingelse: [four, five, six]
     steps:
       - name: Debug
         # yamllint disable rule:line-length
         run: |
           echo "you are in ${{ matrix.test-directory }}"
+          echo "with ${{ matrix.somethingelse }}"
         # yamllint enable rule:line-length
 
   job1:
