@@ -11,94 +11,55 @@ on:
       - main
 
 jobs:
-  discover-test-cases:
-    name: Discover test case directories
+  spin_up:
     runs-on: ubuntu-latest
-    outputs:
-      test-matrix: ${{ steps.set-matrix.outputs.test-matrix }}
     steps:
       - uses: actions/checkout@v3
-      - name: Set matrix
-        id: set-matrix
-        # yamllint disable rule:line-length
-        run: |
-          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')"
-          echo "matches=${matches}"
-          echo "::set-output name=test-matrix::${matches}"
-        # yamllint enable rule:line-length
-  debug-test-cases:
-    runs-on: ubuntu-latest
-    needs: discover-test-cases
-    strategy:
-      matrix:
-        # yamllint disable-line rule:line-length
-        test-directory: ${{ fromJson(needs.discover-test-cases.outputs.test-matrix) }}
-    steps:
-      - name: Debug
-        # yamllint disable rule:line-length
-        run: |
-          echo "matrix=${{ toJson(needs.discover-test-cases.outputs.test-matrix) }}"
-          echo "dir=${{ matrix.test-directory }}"
-        # yamllint enable rule:line-length
-
-  discover-test-cases-new:
-    name: Discover test case directories
-    runs-on: ubuntu-latest
-    outputs:
-      test-matrix-new: ${{ steps.set-matrix.outputs.test-matrix-new }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set matrix
-        id: set-matrix-new
-        # yamllint disable rule:line-length
-        run: |
-          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')"
-          echo "matches=${matches}"
-          echo "{test-matrix-new}={${matches}}" >> $GITHUB_OUTPUT
-        # yamllint enable rule:line-length
-  debug-the-value-new:
-    runs-on: ubuntu-latest
-    needs: discover-test-cases-new
-    steps:
-      - name: Debug
-        # yamllint disable rule:line-length
-        run: |
-          echo "needs1=${{ toJson(needs.discover-test-cases-new.outputs.test-matrix-new) }}"
-          echo "steps1=${{ toJson(steps.discover-test-cases-new.outputs.test-matrix-new) }}"
-          echo "needs2=${{ toJson(needs.set-matrix-new.outputs.test-matrix-new) }}"
-          echo "steps2=${{ toJson(steps.set-matrix-new.outputs.test-matrix-new) }}"
-        # yamllint enable rule:line-length
-  debug-test-cases-new:
-    runs-on: ubuntu-latest
-    needs: discover-test-cases-new
-    strategy:
-      matrix:
-        # yamllint disable-line rule:line-length
-        test-directory: [foo, bar]
-    steps:
-      - name: Debug
-        # yamllint disable rule:line-length
-        run: |
-          echo "matrix=${{ toJson(steps.set-matrix-new.outputs.test-matrix-new) }}"
-          echo "dir=${{ matrix.test-directory }}"
-        # yamllint enable rule:line-length
-
-  from-github-page:
-    runs-on: ubuntu-latest
-    steps:
       - name: Set color
         id: random-color-generator
         run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
       - name: Get color
         # yamllint disable rule:line-length
         run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+        # yamllint enable rule:line-lengthprework
+      - name: Set matrix
+        id: discover-test-cases
+        # yamllint disable rule:line-length
+        run: |
+          matches="$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')"
+          echo "matches=${matches}"
+          echo "DISCOVERED_TESTS='${matches}'" >> $GITHUB_OUTPUT
         # yamllint enable rule:line-length
+      - name: Get Tests
+        # yamllint disable rule:line-length
+        run: echo "The discovered tests are ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }}"
+        # yamllint enable rule:line-lengthprework
+      - name: Summary
+        run: echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
 
-  after-github-page:
+    outputs:
+      DISCOVERED: ${{ steps.discover-test-cases.outputs.DISCOVERED_TESTS }}
+      SELECTED_COLORX: ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}
+
+  something_colorful:
     runs-on: ubuntu-latest
-    needs: from-github-page
+    needs: spin_up
     steps:
       - name: Get color
         # yamllint disable rule:line-length
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+        run: echo "The selected color is ${{ needs.spin_up.outputs.SELECTED_COLOR }}"
+        # yamllint enable rule:line-length
+
+  something_testy:
+    runs-on: ubuntu-latest
+    needs: spin_up
+    strategy:
+      matrix:
+        # yamllint disable-line rule:line-length
+        test-directory: ${{ needs.spin_up.outputs.DISCOVERED }}
+    steps:
+      - name: Debug
+        # yamllint disable rule:line-length
+        run: |
+          echo "matrix=${{ toJson(needs.spin_up.outputs.DISCOVERED) }}"
         # yamllint enable rule:line-length
