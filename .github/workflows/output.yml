@@ -31,7 +31,7 @@ jobs:
           # use jq-fu to convert the list into a json array, and then into a json string
           matches=$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1] |@json')
           # push into our step output
-          echo "DISCOVERED_TESTS='${matches}'" >> $GITHUB_OUTPUT
+          echo "DISCOVERED_TESTS=${matches}" >> $GITHUB_OUTPUT
         # yamllint enable rule:line-length
       - name: Get Tests
         # yamllint disable rule:line-length
