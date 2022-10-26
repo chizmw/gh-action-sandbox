@@ -46,7 +46,7 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
           echo '```txt' >> $GITHUB_STEP_SUMMARY
-          echo ${{ toJson(steps.discover-test-cases.outputs.DISCOVERED_TESTS) }} >> $GITHUB_STEP_SUMMARY
+          echo ${{ fromJson(steps.discover-test-cases.outputs.DISCOVERED_TESTS) }} >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
     outputs:
