@@ -29,7 +29,7 @@ jobs:
           # get a list of all the test-*/ directories in the test directory
           # use sed to remove the (trailing) '/'
           # use jq-fu to convert the list into a json array, and then into a json string
-          matches=$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1]')
+          matches=$((cd terraform-test && /bin/ls -1d */) |sed 's!/!!' |jq -M -R -s -c 'split("\n")[:-1] |@json')
           echo "matches=${matches}"
           # push into our step output
           echo "DISCOVERED_TESTS='${matches}'" >> $GITHUB_OUTPUT
