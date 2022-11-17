@@ -1,0 +1,4 @@
+---
+kind: Added
+body: add .yamllint.yml to ignore .changes/unreleased/
+time: 2022-11-17T11:49:50.520598Z
