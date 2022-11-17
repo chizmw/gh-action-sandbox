@@ -90,6 +90,7 @@ jobs:
           committer_name: GitHub Actions
           committer_email: actions@github.com
           tag: ${{ steps.semvers.outputs.patch }}
+          default_author: github_actions
           add: |
             .changes/
             CHANGELOG.md
