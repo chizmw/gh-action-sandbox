@@ -1,0 +1,26 @@
+---
+name: Output Testing
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  spin_up:
+    runs-on: ubuntu-latest
+    steps:
+      # we want our change information to be ready to go, but not yet batched
+      # so the pipeline can manage it for us (and we don't have to worry about
+      # versions/tags/etc)
+      - name: Check for changelog entry
+        uses: brettcannon/check-for-changed-files@v1.1.0
+        with:
+          file-pattern: |
+            .changes/unreleased/*.yaml
+          skip-label: skip changelog
+          failure-message: Missing change entries waiting to be batched
