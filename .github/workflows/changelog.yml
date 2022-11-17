@@ -1,5 +1,5 @@
 ---
-name: Output Testing
+name: ChangeLog
 
 # yamllint disable-line rule:truthy
 on:
