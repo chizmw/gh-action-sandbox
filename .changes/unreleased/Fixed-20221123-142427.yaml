@@ -1,3 +1,0 @@
-kind: Fixed
-body: exclude .changes/unreleased/ from yaml* pre-commit hooks
-time: 2022-11-23T14:24:27.832116Z
