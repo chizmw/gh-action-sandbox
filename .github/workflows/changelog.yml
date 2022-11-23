@@ -17,6 +17,8 @@ jobs:
       # we want our change information to be ready to go, but not yet batched
       # so the pipeline can manage it for us (and we don't have to worry about
       # versions/tags/etc)
+      #
+      # we check for this in PRs and on main
       - name: Check for changelog entry
         uses: brettcannon/check-for-changed-files@v1.1.0
         with:
@@ -30,6 +32,9 @@ jobs:
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
+          # Required due to the way Git works, without it this action won't be
+          # able to find any or the correct tags
+          fetch-depth: 0
 
       - name: Get Previous tag
         id: previoustag
