@@ -94,7 +94,7 @@ jobs:
           message: Bake changes for ${{ steps.semvers.outputs.v_patch }}
           committer_name: GitHub Actions
           committer_email: actions@github.com
-          tag: ${{ steps.semvers.outputs.patch }}
+          tag: ${{ steps.semvers.outputs.v_patch }}
           default_author: github_actions
           add: |
             .changes/
